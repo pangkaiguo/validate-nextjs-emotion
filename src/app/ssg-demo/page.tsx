@@ -3,7 +3,7 @@
 // or we rely on Next.js automatic static optimization (no dynamic functions)
 
 import { SSGCard, StyledSSGCard } from "@/components/ssg-demo-card";
-import { SSRPerformanceMonitor } from "@/components/ssr-performance-monitor";
+import { SSGPerformanceMonitor } from "@/components/perf-monitor-ssg";
 
 // Force static generation (SSG) - this page will be pre-rendered at build time
 export const dynamic = "force-static";
@@ -167,7 +167,7 @@ export default function SSGDemoPage() {
           Performance API. This static page was pre-built at build time, then
           hydrated on the client. The Emotion styles were baked into the HTML.
         </p>
-        <SSRPerformanceMonitor mode="ssg" />
+        <SSGPerformanceMonitor />
       </section>
 
       {/* Section 5: Build Output Files */}

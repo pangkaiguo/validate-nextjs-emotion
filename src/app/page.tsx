@@ -3,7 +3,7 @@
 /** @jsxImportSource @emotion/react */
 import { css } from '@emotion/react';
 import styled from '@emotion/styled';
-import { SSRPerformanceMonitor } from "@/components/ssr-performance-monitor";
+import { ClientPerformanceMonitor } from "@/components/perf-monitor-client";
 
 const Container = styled.div`
   max-width: 1000px;
@@ -381,7 +381,7 @@ export default function Page() {
         with the Emotion runtime enabled. All styled components below use
         Emotion's styled and css APIs.
       </p>
-      <SSRPerformanceMonitor mode="client" />
+      <ClientPerformanceMonitor />
 
       {/* Footer */}
       <footer

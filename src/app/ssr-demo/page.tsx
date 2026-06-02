@@ -7,7 +7,7 @@ import {
   StyledGradientCard,
   ServerComponentWrapper,
 } from "@/components/ssr-demo-card";
-import { SSRPerformanceMonitor } from "@/components/ssr-performance-monitor";
+import { SSRPerformanceMonitor } from "@/components/perf-monitor-ssr";
 
 const sectionStyle: React.CSSProperties = {
   marginBottom: "32px",
@@ -147,7 +147,7 @@ export default function SSRDemoPage() {
           Performance API. These metrics demonstrate the SSR advantage — the
           page is fully styled before JavaScript finishes loading.
         </p>
-        <SSRPerformanceMonitor mode="ssr" />
+        <SSRPerformanceMonitor />
       </section>
 
       {/* Section 5: Verification instructions */}
