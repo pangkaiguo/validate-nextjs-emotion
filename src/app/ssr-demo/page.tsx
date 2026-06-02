@@ -147,7 +147,7 @@ export default function SSRDemoPage() {
           Performance API. These metrics demonstrate the SSR advantage — the
           page is fully styled before JavaScript finishes loading.
         </p>
-        <SSRPerformanceMonitor />
+        <SSRPerformanceMonitor mode="ssr" />
       </section>
 
       {/* Section 5: Verification instructions */}

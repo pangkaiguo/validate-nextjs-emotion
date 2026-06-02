@@ -4,12 +4,6 @@ import { css } from '@emotion/react';
 import styled from '@emotion/styled';
 import { useEffect, useState } from 'react';
 
-// ==========================================
-// SSR Performance Monitor
-// Shows real-time metrics for SSR performance
-// Measures: TTFB, FCP, DOM Content Loaded, Emotion styles
-// ==========================================
-
 const Panel = styled.div`
   background: #1a1a2e;
   border: 2px solid #e94560;
@@ -117,11 +111,6 @@ const GlowText = styled.span`
   font-weight: 600;
 `;
 
-const WarningText = styled.span`
-  color: #e94560;
-  font-weight: 600;
-`;
-
 const CodeInline = styled.code`
   background: #0f3460;
   padding: 2px 6px;
@@ -130,7 +119,78 @@ const CodeInline = styled.code`
   color: #4ecca3;
 `;
 
-export function SSRPerformanceMonitor() {
+const ModeBadge = styled.span<{ mode: string }>`
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  margin-left: 8px;
+  background: ${(props) =>
+    props.mode === 'ssr' ? '#667eea' : props.mode === 'ssg' ? '#28a745' : '#f0a500'};
+  color: white;
+`;
+
+export type RenderMode = 'ssr' | 'ssg' | 'client';
+
+const modeConfig: Record<RenderMode, {
+  title: string;
+  emoji: string;
+  borderColor: string;
+  summary: string;
+  advantage: string;
+  bullets: string[];
+  barColor: string;
+  barLabel: string;
+}> = {
+  ssr: {
+    title: 'SSR Performance Metrics',
+    emoji: '\u{1F5A5}\uFE0F',
+    borderColor: '#667eea',
+    summary: 'This page was rendered on the server (SSR). Emotion styles were extracted via useServerInsertedHTML and injected into the HTML <head> before sending to the browser.',
+    advantage: 'SSR Advantage: The page HTML already contains rendered Emotion styles. The browser can paint the styled UI immediately without waiting for JS.',
+    bullets: [
+      'SSR delivers pre-rendered HTML — no FOUC (Flash of Unstyled Content)',
+      'Emotion styles are in the <head>, applied before the browser paints',
+      'JavaScript hydration is non-blocking — user sees styled UI while React hydrates',
+      'Even with JS disabled, the page remains fully styled',
+    ],
+    barColor: '#667eea',
+    barLabel: 'SSR (this page)',
+  },
+  ssg: {
+    title: 'SSG Performance Metrics',
+    emoji: '\u{1F4E6}',
+    borderColor: '#28a745',
+    summary: 'This page was pre-built at build time (SSG). The Emotion styles were extracted during static generation and baked into the final .html file. No server runtime needed.',
+    advantage: 'SSG Advantage: The page is fully static — Emotion styles were embedded at build time. Can be served from a CDN with zero server cost.',
+    bullets: [
+      'Static HTML generated at build time — no server round-trip needed',
+      'Emotion styles are baked into the .html file in <head>',
+      'CDN-ready: deploy to any static hosting (Vercel, Netlify, S3)',
+      'Sub-second TTFB because there is no server computation',
+    ],
+    barColor: '#28a745',
+    barLabel: 'SSG (this page)',
+  },
+  client: {
+    title: 'Client Component Performance Metrics',
+    emoji: '\u{1F3AD}',
+    borderColor: '#f0a500',
+    summary: 'This page is a Client Component. Emotion styles are rendered at runtime in the browser. Note that even for Client Components, Next.js auto-static-optimizes pages that don\'t use dynamic features.',
+    advantage: 'Hybrid Advantage: Even as a Client Component, Emotion styles were pre-rendered via SSR/static generation at the layout level.',
+    bullets: [
+      'Emotion styles were SSR\'d even for this Client Component page',
+      'No FOUC — styles still appear before JavaScript hydration',
+      'Runtime interactivity (hover, animations) works after hydration',
+      'Styled components with dynamic props work correctly',
+    ],
+    barColor: '#f0a500',
+    barLabel: 'Client Component (this page)',
+  },
+};
+
+export function SSRPerformanceMonitor({ mode = 'ssr' }: { mode?: RenderMode }) {
   const [metrics, setMetrics] = useState<{
     ttfb: number | null;
     fcp: number | null;
@@ -154,6 +214,7 @@ export function SSRPerformanceMonitor() {
   });
 
   const [pageRenderTime, setPageRenderTime] = useState<number | null>(null);
+  const cfg = modeConfig[mode];
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -165,29 +226,18 @@ export function SSRPerformanceMonitor() {
       setPageRenderTime(renderEnd - renderStart);
     });
 
-    // Collect all metrics in one pass
     const newMetrics: typeof metrics = {
-      ttfb: null,
-      fcp: null,
-      domContentLoaded: null,
-      loadTime: null,
-      emotionStyleCount: 0,
-      emotionCSSBytes: 0,
-      navigationType: 'unknown',
-      jsBundleSize: null,
-      ssrHtmlBytes: null,
+      ttfb: null, fcp: null, domContentLoaded: null, loadTime: null,
+      emotionStyleCount: 0, emotionCSSBytes: 0, navigationType: 'unknown',
+      jsBundleSize: null, ssrHtmlBytes: null,
     };
 
-    // Count Emotion styles
     const styleTags = document.querySelectorAll('style[data-emotion]');
     let emotionCSSBytes = 0;
-    styleTags.forEach((tag) => {
-      emotionCSSBytes += tag.textContent?.length || 0;
-    });
+    styleTags.forEach((tag) => { emotionCSSBytes += tag.textContent?.length || 0; });
     newMetrics.emotionStyleCount = styleTags.length;
     newMetrics.emotionCSSBytes = emotionCSSBytes;
 
-    // Navigation timing
     const navEntries = performance.getEntriesByType('navigation');
     if (navEntries.length > 0) {
       const nav = navEntries[0] as PerformanceNavigationTiming;
@@ -197,46 +247,27 @@ export function SSRPerformanceMonitor() {
       newMetrics.navigationType = nav.type;
     }
 
-    // FCP from Paint Timing API
     const paintEntries = performance.getEntriesByType('paint');
-    const fcpEntry = paintEntries.find(
-      (entry) => entry.name === 'first-contentful-paint'
-    );
-    if (fcpEntry) {
-      newMetrics.fcp = Math.round(fcpEntry.startTime);
-    }
+    const fcpEntry = paintEntries.find((e) => e.name === 'first-contentful-paint');
+    if (fcpEntry) newMetrics.fcp = Math.round(fcpEntry.startTime);
 
-    // Estimate JS bundle size
     const resources = performance.getEntriesByType('resource');
     const jsResources = resources.filter(
-      (r) =>
-        r.name.includes('.js') &&
-        r.name.includes(window.location.hostname)
+      (r) => r.name.includes('.js') && r.name.includes(window.location.hostname)
     );
     newMetrics.jsBundleSize = Math.round(
       jsResources.reduce((sum, r) => sum + (r as PerformanceResourceTiming).transferSize, 0) / 1024
     );
-
-    // SSR HTML body size
     newMetrics.ssrHtmlBytes = new Blob([document.documentElement.outerHTML]).size;
 
-    // Defer setState to avoid cascading render warning
-    // (We're reading browser APIs, not synchronizing React state)
-    queueMicrotask(() => {
-      setMetrics(newMetrics);
-    });
+    queueMicrotask(() => { setMetrics(newMetrics); });
   }, []);
-
-  // Simulated CSR baseline for comparison
-  // In a real CSR scenario, the page would need to:
-  // 1. Download JS bundles
-  // 2. Parse & execute React
-  // 3. Generate styles at runtime
 
   return (
     <Panel>
       <PanelTitle>
-        {'\u{1F4CA}'} SSR Performance Metrics
+        {'\u{1F4CA}'} {cfg.emoji} {cfg.title}
+        <ModeBadge mode={mode}>{mode.toUpperCase()}</ModeBadge>
         <span style={{ fontSize: '0.7rem', color: '#666', fontWeight: 400 }}>
           (measured in browser)
         </span>
@@ -248,7 +279,7 @@ export function SSRPerformanceMonitor() {
             {metrics.ttfb !== null ? `${metrics.ttfb}ms` : '...'}
           </MetricValue>
           <MetricLabel>TTFB</MetricLabel>
-          <MetricSubtext>Time to First Byte (server response)</MetricSubtext>
+          <MetricSubtext>Time to First Byte</MetricSubtext>
         </MetricCard>
 
         <MetricCard>
@@ -261,9 +292,7 @@ export function SSRPerformanceMonitor() {
 
         <MetricCard highlight>
           <MetricValue color="#e94560">
-            {metrics.domContentLoaded !== null
-              ? `${metrics.domContentLoaded}ms`
-              : '...'}
+            {metrics.domContentLoaded !== null ? `${metrics.domContentLoaded}ms` : '...'}
           </MetricValue>
           <MetricLabel>DOM Content Loaded</MetricLabel>
           <MetricSubtext>HTML parsed + styles applied</MetricSubtext>
@@ -279,46 +308,39 @@ export function SSRPerformanceMonitor() {
 
         <MetricCard>
           <MetricValue color="#f0a500">
-            {pageRenderTime !== null
-              ? `${pageRenderTime.toFixed(1)}ms`
-              : '...'}
+            {pageRenderTime !== null ? `${pageRenderTime.toFixed(1)}ms` : '...'}
           </MetricValue>
           <MetricLabel>React Hydration</MetricLabel>
-          <MetricSubtext>Time for React to hydrate Emotion components</MetricSubtext>
+          <MetricSubtext>Hydrate Emotion components on client</MetricSubtext>
         </MetricCard>
 
         <MetricCard>
           <MetricValue color="#f0a500">
             {metrics.emotionStyleCount}
           </MetricValue>
-          <MetricLabel>
-            {'<style data-emotion>'} Tags
-          </MetricLabel>
+          <MetricLabel>{'<style data-emotion>'} Tags</MetricLabel>
           <MetricSubtext>
-            {metrics.emotionCSSBytes > 0
-              ? `${(metrics.emotionCSSBytes / 1024).toFixed(1)} KB of CSS`
-              : '0 KB'}
+            {metrics.emotionCSSBytes > 0 ? `${(metrics.emotionCSSBytes / 1024).toFixed(1)} KB` : '0 KB'}
           </MetricSubtext>
         </MetricCard>
       </MetricGrid>
 
-      {/* What SSR Means For Performance */}
       <ComparisonBarWrapper>
-        <div
-          css={css`
-            font-size: 0.85rem;
-            color: #ccc;
-            margin-bottom: 12px;
-          `}
-        >
-          <strong style={{ color: '#4ecca3' }}>SSR Advantage:</strong> With SSR,
-          the page HTML already contains the rendered Emotion styles. The browser
-          can paint the styled UI <GlowText>immediately</GlowText> without waiting
-          for JavaScript to parse and inject CSS.
+        <div css={css`
+          font-size: 0.85rem; color: #ccc; margin-bottom: 12px;
+        `}>
+          <strong style={{ color: cfg.barColor }}>{cfg.advantage.split(':')[0]}:</strong>
+          {cfg.advantage.split(':').slice(1).join(':')}
+        </div>
+
+        <div css={css`
+          font-size: 0.8rem; color: #aaa; margin-bottom: 12px; line-height: 1.6;
+        `}>
+          {cfg.summary}
         </div>
 
         <ComparisonRow>
-          <ComparisonLabel>SSR (this page):</ComparisonLabel>
+          <ComparisonLabel>{cfg.barLabel}:</ComparisonLabel>
           <BarTrack>
             <BarFill
               width={
@@ -328,7 +350,7 @@ export function SSRPerformanceMonitor() {
                     ? '50%'
                     : '70%'
               }
-              color="#4ecca3"
+              color={cfg.barColor}
             >
               {metrics.ttfb !== null ? `${metrics.ttfb}ms TTFB` : '...'}
             </BarFill>
@@ -336,7 +358,7 @@ export function SSRPerformanceMonitor() {
         </ComparisonRow>
 
         <ComparisonRow>
-          <ComparisonLabel>CSR (no SSR):</ComparisonLabel>
+          <ComparisonLabel>CSR (no SSR/SSG):</ComparisonLabel>
           <BarTrack>
             <BarFill width="100%" color="#e94560">
               ~500-2000ms (JS download + parse + render)
@@ -344,53 +366,24 @@ export function SSRPerformanceMonitor() {
           </BarTrack>
         </ComparisonRow>
 
-        <div
-          css={css`
-            font-size: 0.75rem;
-            color: #666;
-            line-height: 1.6;
-            margin-top: 12px;
-            border-top: 1px solid #0f3460;
-            padding-top: 12px;
-          `}
-        >
-          <div>
-            <GlowText>{'\u2705'}</GlowText> SSR delivers pre-rendered HTML — no
-            flash of unstyled content (FOUC).
-          </div>
-          <div>
-            <GlowText>{'\u2705'}</GlowText> Emotion styles are in the{' '}
-            <CodeInline>{'<head>'}</CodeInline>, applied before the browser
-            paints.
-          </div>
-          <div>
-            <GlowText>{'\u2705'}</GlowText> JavaScript hydration is
-            non-blocking — the user sees the styled UI while React hydrates in
-            the background.
-          </div>
-          <div>
-            <GlowText>{'\u2705'}</GlowText> Even with JS disabled, the page
-            remains fully styled because CSS was injected at the server level.
-          </div>
+        <div css={css`
+          font-size: 0.75rem; color: #666; line-height: 1.6;
+          margin-top: 12px; border-top: 1px solid #0f3460; padding-top: 12px;
+        `}>
+          {cfg.bullets.map((bullet, i) => (
+            <div key={i}>
+              <GlowText>{'\u2705'}</GlowText> {bullet}
+            </div>
+          ))}
         </div>
       </ComparisonBarWrapper>
 
-      {/* Navigation info */}
-      <div
-        css={css`
-          margin-top: 16px;
-          font-size: 0.7rem;
-          color: #555;
-          text-align: center;
-        `}
-      >
+      <div css={css`
+        margin-top: 16px; font-size: 0.7rem; color: #555; text-align: center;
+      `}>
         Navigation type: <CodeInline>{metrics.navigationType}</CodeInline> |
-        Estimated JS bundle: <CodeInline>{metrics.jsBundleSize ?? '...'} KB</CodeInline> |
-        HTML size: <CodeInline>
-          {metrics.ssrHtmlBytes
-            ? `${(metrics.ssrHtmlBytes / 1024).toFixed(1)} KB`
-            : '...'}
-        </CodeInline>
+        JS bundle: <CodeInline>{metrics.jsBundleSize ?? '...'} KB</CodeInline> |
+        HTML: <CodeInline>{metrics.ssrHtmlBytes ? `${(metrics.ssrHtmlBytes / 1024).toFixed(1)} KB` : '...'}</CodeInline>
       </div>
     </Panel>
   );

@@ -381,7 +381,7 @@ export default function Page() {
         with the Emotion runtime enabled. All styled components below use
         Emotion's styled and css APIs.
       </p>
-      <SSRPerformanceMonitor />
+      <SSRPerformanceMonitor mode="client" />
 
       {/* Footer */}
       <footer

@@ -167,7 +167,7 @@ export default function SSGDemoPage() {
           Performance API. This static page was pre-built at build time, then
           hydrated on the client. The Emotion styles were baked into the HTML.
         </p>
-        <SSRPerformanceMonitor />
+        <SSRPerformanceMonitor mode="ssg" />
       </section>
 
       {/* Section 5: Build Output Files */}
