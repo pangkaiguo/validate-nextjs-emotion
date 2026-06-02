@@ -104,6 +104,28 @@ export default function SSGDemoPage() {
         Pure SSG — pre-built static HTML with Emotion styles baked in
       </p>
 
+      {/* ⚠️ Official Status Banner */}
+      <div style={{ background: "#fff3e0", border: "2px solid #ff9800", borderRadius: "12px", padding: "20px", marginBottom: "24px" }}>
+        <strong style={{ color: "#e65100", fontSize: "1.1rem" }}>
+          ⚠️ Official Next.js Status: Emotion is &ldquo;currently working on support&rdquo;
+        </strong>
+        <p style={{ margin: "8px 0 0", color: "#555", lineHeight: 1.6 }}>
+          According to{' '}
+          <a href="https://nextjs.org/docs/app/guides/css-in-js" target="_blank" rel="noopener noreferrer">
+            Next.js CSS-in-JS docs
+          </a>
+          , Emotion is <strong>not yet officially supported</strong> in the App Router.
+          This SSG workaround <Highlight>EmotionRegistry + useServerInsertedHTML</Highlight> works
+          today but may need updates as official support matures.
+        </p>
+        <p style={{ margin: "8px 0 0", color: "#555", lineHeight: 1.6 }}>
+          <strong>Tracking issue:</strong>{' '}
+          <a href="https://github.com/emotion-js/emotion/issues/2928" target="_blank" rel="noopener noreferrer">
+            emotion-js/emotion#2928
+          </a>
+        </p>
+      </div>
+
       {/* Section 1: SSG Architecture */}
       <div style={infoBoxStyle}>
         <strong style={{ color: "#2e7d32", fontSize: "1.1rem" }}>

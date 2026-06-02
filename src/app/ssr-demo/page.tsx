@@ -35,6 +35,14 @@ const infoBoxStyle: React.CSSProperties = {
   marginBottom: "24px",
 };
 
+const warningBoxStyle: React.CSSProperties = {
+  background: "#fff3e0",
+  border: "2px solid #ff9800",
+  borderRadius: "12px",
+  padding: "20px",
+  marginBottom: "24px",
+};
+
 const codeStyle: React.CSSProperties = {
   background: "#e3e8ee",
   padding: "2px 6px",
@@ -112,6 +120,32 @@ export default function SSRDemoPage() {
         Pure SSR — all content rendered on the server, no client hooks
       </p>
 
+      {/* ⚠️ Official Status Banner */}
+      <div style={warningBoxStyle}>
+        <strong style={{ color: "#e65100", fontSize: "1.1rem" }}>
+          ⚠️ Official Next.js Status: Emotion is &ldquo;currently working on support&rdquo;
+        </strong>
+        <p style={{ margin: "8px 0 0", color: "#555", lineHeight: 1.6 }}>
+          According to{' '}
+          <a href="https://nextjs.org/docs/app/guides/css-in-js" target="_blank" rel="noopener noreferrer">
+            Next.js CSS-in-JS docs
+          </a>
+          , Emotion is <strong>not yet officially supported</strong> in the App Router.
+          The team is testing different libraries and will add more examples as support matures.
+        </p>
+        <p style={{ margin: "8px 0 0", color: "#555", lineHeight: 1.6 }}>
+          <strong>Tracking issue:</strong>{' '}
+          <a href="https://github.com/emotion-js/emotion/issues/2928" target="_blank" rel="noopener noreferrer">
+            emotion-js/emotion#2928
+          </a>
+          <br />
+          <strong>Workaround approach:</strong> Use <HL>EmotionRegistry</HL> with{' '}
+          <HL>useServerInsertedHTML</HL> as described in the Next.js docs. This
+          project validates this approach works for SSR/SSG today, but be aware
+          that official support is still in progress.
+        </p>
+      </div>
+
       {/* Section 1: SSR Architecture */}
       <div style={infoBoxStyle}>
         <strong style={{ color: "#d48806", fontSize: "1.1rem" }}>
@@ -180,7 +214,7 @@ export default function SSRDemoPage() {
         </ServerComponentWrapper>
       </section>
 
-      {/* Section 4: SSR Metrics (static, embedded in initial HTML) */}
+      {/* Section 4: SSR Metrics */}
       <section style={sectionStyle}>
         <h2 style={headingStyle}>
           3. SSR Performance Expectations
