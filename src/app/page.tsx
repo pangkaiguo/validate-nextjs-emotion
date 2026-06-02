@@ -136,6 +136,19 @@ export default function Home() {
           </NavCard>
         </a>
 
+        <a href="/styled-components-demo" style={{ textDecoration: 'none' }}>
+          <NavCard gradient="linear-gradient(135deg, #7928ca 0%, #ff0080 100%)">
+            <NavTag bg="rgba(255,255,255,0.25)">
+              {'\u{1F49C}'} Official Support
+            </NavTag>
+            <NavTitle>Styled-Components Demo</NavTitle>
+            <NavDesc>
+              See why styled-components is the recommended CSS-in-JS solution for
+              Next.js App Router — with first-class SSR/SSG support.
+            </NavDesc>
+          </NavCard>
+        </a>
+
         <a href="/" style={{ textDecoration: 'none' }}>
           <NavCard gradient="linear-gradient(135deg, #f093fb 0%, #f5576c 100%)">
             <NavTag bg="rgba(255,255,255,0.25)">
