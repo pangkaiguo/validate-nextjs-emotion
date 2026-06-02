@@ -3,6 +3,7 @@
 /** @jsxImportSource @emotion/react */
 import { css } from '@emotion/react';
 import styled from '@emotion/styled';
+import { SSRPerformanceMonitor } from "@/components/ssr-performance-monitor";
 
 const Container = styled.div`
   max-width: 1000px;
@@ -364,6 +365,23 @@ export default function Page() {
           from your component library will be automatically SSR'd and SSG'd by Next.js.
         </p>
       </div>
+
+      {/* Performance Metrics (Home Page - Client Component) */}
+      <SectionTitle>{'\u{1F4CA}'} Performance Metrics (Home Page)</SectionTitle>
+      <p
+        css={css`
+          color: #555;
+          font-size: 1rem;
+          line-height: 1.6;
+          margin-bottom: 20px;
+        `}
+      >
+        Real-time performance measurements collected from the browser's
+        Performance API. This home page is a {"'use client'"} component
+        with the Emotion runtime enabled. All styled components below use
+        Emotion's styled and css APIs.
+      </p>
+      <SSRPerformanceMonitor />
 
       {/* Footer */}
       <footer
