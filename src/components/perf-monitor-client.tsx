@@ -18,9 +18,6 @@ const Title = styled.h3`
   color: #f0a500;
   font-size: 1.1rem;
   margin: 0 0 4px 0;
-  display: flex;
-  align-items: center;
-  gap: 8px;
 `;
 
 const Subtitle = styled.p`
@@ -31,7 +28,7 @@ const Subtitle = styled.p`
 
 const Grid = styled.div`
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
   gap: 10px;
   margin-bottom: 16px;
 `;
@@ -88,14 +85,14 @@ const BarRow = styled.div`
 const BarLabel = styled.div`
   font-size: 0.7rem;
   color: #aaa;
-  min-width: 90px;
+  min-width: 100px;
 `;
 
 const BarTrack = styled.div`
   flex: 1;
-  height: 18px;
+  height: 20px;
   background: #1a1a2e;
-  border-radius: 9px;
+  border-radius: 10px;
   overflow: hidden;
 `;
 
@@ -103,7 +100,7 @@ const BarFill = styled.div<{ w: string }>`
   height: 100%;
   width: ${(p) => p.w};
   background: #f0a500;
-  border-radius: 9px;
+  border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: flex-end;
@@ -115,10 +112,9 @@ const BarFill = styled.div<{ w: string }>`
 `;
 
 export function ClientPerformanceMonitor() {
-  const [ttfb, setTtfb] = useState<number | null>(null);
+  const [fullLoad, setFullLoad] = useState<number | null>(null);
   const [fcp, setFcp] = useState<number | null>(null);
   const [domLoaded, setDomLoaded] = useState<number | null>(null);
-  const [fullLoad, setFullLoad] = useState<number | null>(null);
   const [hydration, setHydration] = useState<number | null>(null);
   const [styleTags, setStyleTags] = useState(0);
   const [cssKB, setCssKB] = useState('0');
@@ -136,7 +132,6 @@ export function ClientPerformanceMonitor() {
     queueMicrotask(() => {
       const nav = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming;
       if (nav) {
-        setTtfb(Math.round(nav.responseStart - nav.requestStart));
         setDomLoaded(Math.round(nav.domContentLoadedEventEnd - nav.startTime));
         setFullLoad(Math.round(nav.loadEventEnd - nav.startTime));
       }
@@ -162,15 +157,22 @@ export function ClientPerformanceMonitor() {
 
   return (
     <Panel>
-      <Title>🎭 Client Component Performance Metrics</Title>
-      <Subtitle>Client-rendered page with Emotion runtime &mdash; auto-static-optimized by Next.js</Subtitle>
+      <Title>🎭 Client Component Rendering Performance</Title>
+      <Subtitle>Client component with Emotion runtime — auto-static-optimized by Next.js</Subtitle>
+
+      <div css={{ textAlign: 'center', marginBottom: 16 }}>
+        <div css={{ fontSize: '3rem', fontWeight: 700, color: '#f0a500' }}>
+          {fullLoad !== null ? `${fullLoad}ms` : '...'}
+        </div>
+        <div css={{ fontSize: '0.75rem', color: '#888', textTransform: 'uppercase', letterSpacing: 1 }}>
+          Full Load Time
+        </div>
+        <div css={{ fontSize: '0.65rem', color: '#555', marginTop: 2 }}>
+          Total end-to-end page load
+        </div>
+      </div>
 
       <Grid>
-        <Card>
-          <Value color="#4ecca3">{ttfb !== null ? `${ttfb}ms` : '...'}</Value>
-          <Label>TTFB</Label>
-          <Hint>Server/static file response</Hint>
-        </Card>
         <Card>
           <Value color="#4ecca3">{fcp !== null ? `${fcp}ms` : '...'}</Value>
           <Label>First Paint</Label>
@@ -182,46 +184,38 @@ export function ClientPerformanceMonitor() {
           <Hint>HTML + CSS parsed</Hint>
         </Card>
         <Card>
-          <Value color="#4ecca3">{fullLoad !== null ? `${fullLoad}ms` : '...'}</Value>
-          <Label>Full Load</Label>
-          <Hint>Page fully loaded</Hint>
-        </Card>
-        <Card>
           <Value color="#f0a500">{hydration !== null ? `${hydration}ms` : '...'}</Value>
-          <Label>Hydration</Label>
-          <Hint>React hydrates & activates interactivity</Hint>
+          <Label>React Hydration</Label>
+          <Hint>Hydrate & activate interactivity</Hint>
         </Card>
         <Card>
           <Value color="#f0a500">{styleTags}</Value>
           <Label>Style Tags</Label>
-          <Hint>{cssKB} KB of Emotion CSS</Hint>
+          <Hint>{cssKB} KB Emotion CSS</Hint>
         </Card>
       </Grid>
 
       <BarRow>
         <BarLabel>Client (this page):</BarLabel>
         <BarTrack>
-          <BarFill w={ttfb !== null && ttfb < 100 ? '28%' : ttfb !== null && ttfb < 300 ? '48%' : '68%'}>
-            {ttfb !== null ? `${ttfb}ms TTFB` : '...'}
+          <BarFill w={fullLoad !== null && fullLoad < 500 ? '30%' : fullLoad !== null && fullLoad < 1500 ? '50%' : '75%'}>
+            {fullLoad !== null ? `${fullLoad}ms` : '...'}
           </BarFill>
         </BarTrack>
       </BarRow>
       <BarRow>
-        <BarLabel>Pure CSR (no SSR):</BarLabel>
+        <BarLabel>Pure CSR baseline:</BarLabel>
         <BarTrack>
-          <div css={css`height:100%;width:100%;background:#e94560;border-radius:9px;display:flex;align-items:center;justify-content:flex-end;padding-right:6px;font-size:0.6rem;color:#fff;font-weight:600;`}>
-            ~500-2000ms (download + parse + render)
+          <div css={css`height:100%;width:100%;background:#e94560;border-radius:10px;display:flex;align-items:center;justify-content:flex-end;padding-right:6px;font-size:0.6rem;color:#fff;font-weight:600;`}>
+            ~2000-5000ms (full SPA load)
           </div>
         </BarTrack>
       </BarRow>
 
       <NoteBox>
-        <Highlight>✅ Hybrid Advantage:</Highlight> Even as a Client Component, this page benefits from
-        Next.js auto-static-optimization. Emotion styles from the runtime are applied immediately.
-        Interactive features (hover, animations) work after hydration.
+        <Highlight>✅ Hybrid Advantage:</Highlight> Even as a Client Component, Next.js auto-static-optimizes this page. Emotion styles from the runtime apply immediately. Full Load Time includes the JS needed for interactivity.
         <div css={{ marginTop: 6 }}>
-          JS bundle: <Highlight>{jsKB ?? '...'} KB</Highlight> |
-          HTML size: <Highlight>{htmlKB ?? '...'} KB</Highlight>
+          JS bundle: <Highlight>{jsKB ?? '...'} KB</Highlight> | HTML size: <Highlight>{htmlKB ?? '...'} KB</Highlight>
         </div>
       </NoteBox>
     </Panel>

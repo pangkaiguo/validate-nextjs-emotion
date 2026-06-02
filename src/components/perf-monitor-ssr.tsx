@@ -18,9 +18,6 @@ const Title = styled.h3`
   color: #667eea;
   font-size: 1.1rem;
   margin: 0 0 4px 0;
-  display: flex;
-  align-items: center;
-  gap: 8px;
 `;
 
 const Subtitle = styled.p`
@@ -31,7 +28,7 @@ const Subtitle = styled.p`
 
 const Grid = styled.div`
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
   gap: 10px;
   margin-bottom: 16px;
 `;
@@ -44,8 +41,8 @@ const Card = styled.div`
   text-align: center;
 `;
 
-const Value = styled.div<{ color: string }>`
-  font-size: 1.8rem;
+const Value = styled.div<{ color: string; big?: boolean }>`
+  font-size: ${(p) => (p.big ? '2.4rem' : '1.8rem')};
   font-weight: 700;
   color: ${(p) => p.color};
   margin-bottom: 2px;
@@ -88,14 +85,14 @@ const BarRow = styled.div`
 const BarLabel = styled.div`
   font-size: 0.7rem;
   color: #aaa;
-  min-width: 90px;
+  min-width: 100px;
 `;
 
 const BarTrack = styled.div`
   flex: 1;
-  height: 18px;
+  height: 20px;
   background: #1a1a2e;
-  border-radius: 9px;
+  border-radius: 10px;
   overflow: hidden;
 `;
 
@@ -103,7 +100,7 @@ const BarFill = styled.div<{ w: string }>`
   height: 100%;
   width: ${(p) => p.w};
   background: #667eea;
-  border-radius: 9px;
+  border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: flex-end;
@@ -115,10 +112,9 @@ const BarFill = styled.div<{ w: string }>`
 `;
 
 export function SSRPerformanceMonitor() {
-  const [ttfb, setTtfb] = useState<number | null>(null);
+  const [fullLoad, setFullLoad] = useState<number | null>(null);
   const [fcp, setFcp] = useState<number | null>(null);
   const [domLoaded, setDomLoaded] = useState<number | null>(null);
-  const [fullLoad, setFullLoad] = useState<number | null>(null);
   const [hydration, setHydration] = useState<number | null>(null);
   const [styleTags, setStyleTags] = useState(0);
   const [cssKB, setCssKB] = useState('0');
@@ -134,49 +130,50 @@ export function SSRPerformanceMonitor() {
     });
 
     queueMicrotask(() => {
-      // TTFB & navigation
       const nav = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming;
       if (nav) {
-        setTtfb(Math.round(nav.responseStart - nav.requestStart));
         setDomLoaded(Math.round(nav.domContentLoadedEventEnd - nav.startTime));
         setFullLoad(Math.round(nav.loadEventEnd - nav.startTime));
       }
 
-      // FCP
       const paints = performance.getEntriesByType('paint');
       const f = paints.find((e) => e.name === 'first-contentful-paint');
       if (f) setFcp(Math.round(f.startTime));
 
-      // Emotion styles
       const tags = document.querySelectorAll('style[data-emotion]');
       let bytes = 0;
       tags.forEach((t) => { bytes += t.textContent?.length || 0; });
       setStyleTags(tags.length);
       setCssKB((bytes / 1024).toFixed(1));
 
-      // JS bundle
       const resources = performance.getEntriesByType('resource');
       const js = resources.filter(
         (r) => r.name.includes('.js') && r.name.includes(location.hostname)
       );
       setJsKB(Math.round(js.reduce((s, r) => s + (r as PerformanceResourceTiming).transferSize, 0) / 1024));
-
-      // HTML size
       setHtmlKB(Math.round(new Blob([document.documentElement.outerHTML]).size / 1024));
     });
   }, []);
 
   return (
     <Panel>
-      <Title>🖥️ SSR Performance Metrics</Title>
-      <Subtitle>Real server-rendered page — styles injected via useServerInsertedHTML</Subtitle>
+      <Title>🖥️ SSR Rendering Performance</Title>
+      <Subtitle>Server-side rendered — Emotion styles injected via useServerInsertedHTML</Subtitle>
+
+      {/* Full Load as primary metric */}
+      <div css={{ textAlign: 'center', marginBottom: 16 }}>
+        <div css={{ fontSize: '3rem', fontWeight: 700, color: '#667eea' }}>
+          {fullLoad !== null ? `${fullLoad}ms` : '...'}
+        </div>
+        <div css={{ fontSize: '0.75rem', color: '#888', textTransform: 'uppercase', letterSpacing: 1 }}>
+          Full Load Time
+        </div>
+        <div css={{ fontSize: '0.65rem', color: '#555', marginTop: 2 }}>
+          Total end-to-end page load
+        </div>
+      </div>
 
       <Grid>
-        <Card>
-          <Value color="#4ecca3">{ttfb !== null ? `${ttfb}ms` : '...'}</Value>
-          <Label>TTFB</Label>
-          <Hint>Server response time</Hint>
-        </Card>
         <Card>
           <Value color="#4ecca3">{fcp !== null ? `${fcp}ms` : '...'}</Value>
           <Label>First Paint</Label>
@@ -188,46 +185,39 @@ export function SSRPerformanceMonitor() {
           <Hint>HTML + CSS parsed</Hint>
         </Card>
         <Card>
-          <Value color="#4ecca3">{fullLoad !== null ? `${fullLoad}ms` : '...'}</Value>
-          <Label>Full Load</Label>
-          <Hint>Page fully loaded</Hint>
-        </Card>
-        <Card>
           <Value color="#f0a500">{hydration !== null ? `${hydration}ms` : '...'}</Value>
-          <Label>Hydration</Label>
-          <Hint>React hydrates components</Hint>
+          <Label>React Hydration</Label>
+          <Hint>Hydrate Emotion components</Hint>
         </Card>
         <Card>
           <Value color="#f0a500">{styleTags}</Value>
           <Label>Style Tags</Label>
-          <Hint>{cssKB} KB of Emotion CSS</Hint>
+          <Hint>{cssKB} KB Emotion CSS</Hint>
         </Card>
       </Grid>
 
+      {/* Bar comparison - Full Load */}
       <BarRow>
         <BarLabel>SSR (this page):</BarLabel>
         <BarTrack>
-          <BarFill w={ttfb !== null && ttfb < 100 ? '28%' : ttfb !== null && ttfb < 300 ? '48%' : '68%'}>
-            {ttfb !== null ? `${ttfb}ms TTFB` : '...'}
+          <BarFill w={fullLoad !== null && fullLoad < 500 ? '30%' : fullLoad !== null && fullLoad < 1500 ? '50%' : '75%'}>
+            {fullLoad !== null ? `${fullLoad}ms` : '...'}
           </BarFill>
         </BarTrack>
       </BarRow>
       <BarRow>
-        <BarLabel>CSR (no SSR):</BarLabel>
+        <BarLabel>Pure CSR baseline:</BarLabel>
         <BarTrack>
-          <div css={css`height:100%;width:100%;background:#e94560;border-radius:9px;display:flex;align-items:center;justify-content:flex-end;padding-right:6px;font-size:0.6rem;color:#fff;font-weight:600;`}>
-            ~500-2000ms (download + parse + render)
+          <div css={css`height:100%;width:100%;background:#e94560;border-radius:10px;display:flex;align-items:center;justify-content:flex-end;padding-right:6px;font-size:0.6rem;color:#fff;font-weight:600;`}>
+            ~2000-5000ms (full SPA load)
           </div>
         </BarTrack>
       </BarRow>
 
       <NoteBox>
-        <Highlight>✅ SSR Advantage:</Highlight> The server generated this HTML with Emotion styles
-        already in <code style={{ color: '#4ecca3' }}>{'<head>'}</code>. The browser paints the styled UI
-        immediately — no waiting for JS.
+        <Highlight>✅ SSR Advantage:</Highlight> Full Load Time is the total time from initial request to fully loaded page including Emotion styles. SSR delivers styled HTML in the first response — no extra CSS-in-JS runtime overhead.
         <div css={{ marginTop: 6 }}>
-          JS bundle: <Highlight>{jsKB ?? '...'} KB</Highlight> |
-          HTML size: <Highlight>{htmlKB ?? '...'} KB</Highlight>
+          JS bundle: <Highlight>{jsKB ?? '...'} KB</Highlight> | HTML size: <Highlight>{htmlKB ?? '...'} KB</Highlight>
         </div>
       </NoteBox>
     </Panel>
