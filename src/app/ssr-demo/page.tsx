@@ -7,6 +7,7 @@ import {
   StyledGradientCard,
   ServerComponentWrapper,
 } from "@/components/ssr-demo-card";
+import { SSRPerformanceMonitor } from "@/components/ssr-performance-monitor";
 
 const sectionStyle: React.CSSProperties = {
   marginBottom: "32px",
@@ -138,9 +139,20 @@ export default function SSRDemoPage() {
         </div>
       </section>
 
-      {/* Section 4: Verification instructions */}
+      {/* Section 4: Performance Monitor */}
       <section style={sectionStyle}>
-        <h2 style={headingStyle}>3. Verify SSR is Working</h2>
+        <h2 style={headingStyle}>3. Performance Metrics</h2>
+        <p style={subHeadingStyle}>
+          Real-time performance measurements collected from the browser's
+          Performance API. These metrics demonstrate the SSR advantage — the
+          page is fully styled before JavaScript finishes loading.
+        </p>
+        <SSRPerformanceMonitor />
+      </section>
+
+      {/* Section 5: Verification instructions */}
+      <section style={sectionStyle}>
+        <h2 style={headingStyle}>4. Verify SSR is Working</h2>
         <div
           style={{
             background: "#f0fff4",
