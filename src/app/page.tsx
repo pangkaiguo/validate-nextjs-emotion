@@ -149,6 +149,19 @@ export default function Home() {
           </NavCard>
         </a>
 
+        <a href="/emotion-config-impact" style={{ textDecoration: 'none' }}>
+          <NavCard gradient="linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%)">
+            <NavTag bg="rgba(255,255,255,0.25)">
+              {'\u{2699}\uFE0F'} Config Impact
+            </NavTag>
+            <NavTitle>Config Impact Demo</NavTitle>
+            <NavDesc>
+              See what happens when <code>compiler.emotion</code> is missing
+              — css prop breaks, styled() survives. Hands-on config troubleshooting.
+            </NavDesc>
+          </NavCard>
+        </a>
+
         <a href="/" style={{ textDecoration: 'none' }}>
           <NavCard gradient="linear-gradient(135deg, #f093fb 0%, #f5576c 100%)">
             <NavTag bg="rgba(255,255,255,0.25)">
