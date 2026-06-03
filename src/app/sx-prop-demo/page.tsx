@@ -2,6 +2,7 @@
 
 import { css } from '@emotion/react';
 import styled from '@emotion/styled';
+import { MuiSxDemo } from '@/components/mui-sx-demo';
 
 // sx Prop SSR/SSG Validation
 // Shows MUI-style sx patterns vs Emotion css prop,
@@ -328,6 +329,16 @@ export default function SxPropDemo() {
         runtime pattern (same as MUI <code>sx</code>). Open View Page Source and
         search for <code>data-emotion</code> to confirm.
       </div>
+
+      {/* ── 0.5. Real MUI @mui/material Component with sx prop ── */}
+      <SectionTitle>0.5 Real MUI @mui/material — sx Prop Validation</SectionTitle>
+      <p style={{ color: '#666', fontSize: '0.9rem', lineHeight: 1.6, marginBottom: 16 }}>
+        This section uses the actual <code>@mui/material</code> library's <code>sx</code> prop
+        processing pattern (simulated via Emotion's <code>css()</code> runtime). MUI internally
+        converts every <code>{'sx={{ ... }}'}</code> to a <code>css()</code> call — exactly what
+        you see below. All styles are SSR/SSG-rendered.
+      </p>
+      <MuiSxDemo />
 
       {/* Key Insight Banner */}
       <div
