@@ -176,6 +176,20 @@ export default function Home() {
           </NavCard>
         </a>
 
+        <a href="/sx-prop-demo" style={{ textDecoration: 'none' }}>
+          <NavCard gradient="linear-gradient(135deg, #667eea 0%, #11998e 100%)">
+            <NavTag bg="rgba(255,255,255,0.25)">
+              {'\u{1F3A8}'} sx Prop
+            </NavTag>
+            <NavTitle>MUI sx Prop SSR/SSG Validation</NavTitle>
+            <NavDesc>
+              Validates MUI-style <code>{'sx={{ ... }}'}</code> runtime pattern.
+              Confirms sx works with SSR/SSG <strong>without</strong> compiler.emotion.
+              Includes config impact matrix.
+            </NavDesc>
+          </NavCard>
+        </a>
+
         <a href="/" style={{ textDecoration: 'none' }}>
           <NavCard gradient="linear-gradient(135deg, #f093fb 0%, #f5576c 100%)">
             <NavTag bg="rgba(255,255,255,0.25)">
