@@ -7,6 +7,7 @@ import {
   StyledGradientCard,
   ServerComponentWrapper,
 } from "@/components/ssr-demo-card";
+import { MuiSxDemo } from "@/components/mui-sx-demo";
 
 const sectionStyle: React.CSSProperties = {
   marginBottom: "32px",
@@ -186,6 +187,20 @@ export default function SSRDemoPage() {
             ✓ Browser receives fully styled HTML — FOUC-free rendering
           </div>
         </div>
+      </section>
+
+      {/* Section 2.5: MUI sx Prop — SSR Rendered */}
+      <section style={sectionStyle}>
+        <h2 style={{ ...headingStyle, borderBottomColor: '#7928ca' }}>
+          2.5 MUI sx Prop — SSR Rendered
+        </h2>
+        <p style={subHeadingStyle}>
+          This section demonstrates that MUI-style <code>{'sx={{ ... }}'}</code> props
+          work perfectly with SSR. MUI processes <code>sx</code> at runtime by calling
+          Emotion's <code>css()</code> function — the same pattern used below.
+          All styles are extracted by EmotionRegistry and injected into <HL>{'<head>'}</HL>.
+        </p>
+        <MuiSxDemo />
       </section>
 
       {/* Section 3: Styled Components (SSR'd) */}

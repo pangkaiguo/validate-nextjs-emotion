@@ -3,6 +3,7 @@
 // export const dynamic = "force-static" ensures SSG
 
 import { SSGCard, StyledSSGCard } from "@/components/ssg-demo-card";
+import { MuiSxDemo } from "@/components/mui-sx-demo";
 
 // Force static generation — no server needed at runtime
 export const dynamic = "force-static";
@@ -173,6 +174,20 @@ export default function SSGDemoPage() {
             The .html file is fully self-contained — deploy to any CDN.
           </div>
         </div>
+      </section>
+
+      {/* Section 2.5: MUI sx Prop — SSG Rendered */}
+      <section style={sectionStyle}>
+        <h2 style={{ ...headingStyle, borderBottomColor: '#7928ca' }}>
+          2.5 MUI sx Prop — Static Generated
+        </h2>
+        <p style={{ color: "#555", fontSize: "1rem", lineHeight: "1.6", marginBottom: "20px" }}>
+          This section demonstrates that MUI-style <code>{'sx={{ ... }}'}</code> props
+          are fully pre-rendered during static generation. MUI processes <code>sx</code>
+          at runtime by calling Emotion's <code>css()</code> — the same pattern used below.
+          All styles are baked into the static HTML at build time.
+        </p>
+        <MuiSxDemo />
       </section>
 
       {/* Section 3: Emotion Components (Static) */}
