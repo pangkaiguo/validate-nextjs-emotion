@@ -152,12 +152,26 @@ export default function Home() {
         <a href="/emotion-config-impact" style={{ textDecoration: 'none' }}>
           <NavCard gradient="linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%)">
             <NavTag bg="rgba(255,255,255,0.25)">
-              {'\u{2699}\uFE0F'} Config Impact
+              {'\u{2699}\uFE0F'} Emotion Config
             </NavTag>
-            <NavTitle>Config Impact Demo</NavTitle>
+            <NavTitle>Emotion Config Impact</NavTitle>
             <NavDesc>
               See what happens when <code>compiler.emotion</code> is missing
               — css prop breaks, styled() survives. Hands-on config troubleshooting.
+            </NavDesc>
+          </NavCard>
+        </a>
+
+        <a href="/sc-config-impact" style={{ textDecoration: 'none' }}>
+          <NavCard gradient="linear-gradient(135deg, #667eea 0%, #764ba2 100%)">
+            <NavTag bg="rgba(255,255,255,0.25)">
+              {'\u{1F3AD}'} SC Config
+            </NavTag>
+            <NavTitle>Styled-Components Config Impact</NavTitle>
+            <NavDesc>
+              Live detection of <code>compiler.styledComponents</code> impact.
+              Renders real SC components & detects SSR class name mismatches.
+              Toggle config and see hydration errors in real time.
             </NavDesc>
           </NavCard>
         </a>
