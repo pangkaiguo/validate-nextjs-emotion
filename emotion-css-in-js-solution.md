@@ -874,12 +874,13 @@ export const focusRing = css`
 
 ### 5.4 Provider 模式（多主题插件系统）
 
-大型 CMS 常需要插件化主题系统。这是 Emotion 相对 styled-components 的优势：
-ThemeProvider 支持运行时动态切换。
+大型 CMS 常需要插件化主题系统。Emotion 和 styled-components **都通过 ThemeProvider 支持运行时动态切换**，能力完全对等 — 两者的底层实现都是 React Context，语法和用法完全相同。
+
+#### Emotion 版本
 
 ```tsx
-// 🎯 主题 Provider 封装
-// components/shared/ThemeProvider.tsx
+// 🎯 Emotion 主题 Provider 封装
+// components/shared/EmotionThemeProvider.tsx
 'use client';
 
 import {
@@ -967,6 +968,76 @@ export default function RootLayout({
   );
 }
 ```
+
+#### Styled-components 版本（完全对等）
+
+```tsx
+// 🎯 styled-components 主题 Provider 封装
+// components/shared/SCThemeProvider.tsx
+'use client';
+
+import {
+  ThemeProvider as SCThemeProvider,
+  createGlobalStyle,
+} from 'styled-components';
+import { useState, createContext, useContext, type ReactNode } from 'react';
+import { lightTheme, darkTheme, type CMSTheme } from '@/lib/theme';
+
+type ThemeMode = 'light' | 'dark';
+type ThemeContextType = {
+  mode: ThemeMode;
+  toggleTheme: () => void;
+  setTheme: (mode: ThemeMode) => void;
+};
+
+const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
+
+export function useThemeContext(): ThemeContextType {
+  const ctx = useContext(ThemeContext);
+  if (!ctx) throw new Error('useThemeContext must be within ThemeProvider');
+  return ctx;
+}
+
+// 全局样式（styled-components 的 createGlobalStyle）
+const GlobalStyle = createGlobalStyle<{ $theme: CMSTheme }>`
+  :root {
+    --color-primary: ${({ $theme }) => $theme.colors.primary};
+    --color-background: ${({ $theme }) => $theme.colors.background};
+    --color-text: ${({ $theme }) => $theme.colors.text.primary};
+    --font-heading: ${({ $theme }) => $theme.typography.fontFamily.heading};
+    --font-body: ${({ $theme }) => $theme.typography.fontFamily.body};
+  }
+  body {
+    background: ${({ $theme }) => $theme.colors.background};
+    color: ${({ $theme }) => $theme.colors.text.primary};
+    font-family: ${({ $theme }) => $theme.typography.fontFamily.body};
+    transition: background 250ms ease, color 250ms ease;
+  }
+`;
+
+export function SCThemeProvider({ children }: { children: ReactNode }) {
+  const [mode, setMode] = useState<ThemeMode>('light');
+  const theme = mode === 'light' ? lightTheme : darkTheme;
+
+  const toggleTheme = () => {
+    setMode((prev) => (prev === 'light' ? 'dark' : 'light'));
+  };
+
+  return (
+    <ThemeContext.Provider value={{ mode, toggleTheme, setTheme: setMode }}>
+      <SCThemeProvider theme={theme}>
+        <GlobalStyle $theme={theme} />
+        {children}
+      </SCThemeProvider>
+    </ThemeContext.Provider>
+  );
+}
+```
+
+> **关键结论**: Emotion 和 styled-components 在 ThemeProvider 运行时切换能力上**完全对等**。
+> 两者的底层实现都是 React Context，语法完全相同（`${({ theme }) => theme.colors.x}`），性能也相同。
+> 真正的差异化在于 Emotion 独有的 **css prop** 语法（`<div css={...} />`），
+> 以及 styled-components 在 Next.js 中拥有 **官方第一等支持**。
 
 ### 5.5 关键规则
 

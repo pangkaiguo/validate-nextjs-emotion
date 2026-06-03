@@ -2,8 +2,8 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   compiler: {
-    emotion: true,
-    styledComponents: true,
+    // emotion: true,
+    // styledComponents: true,
   },
 };
 
