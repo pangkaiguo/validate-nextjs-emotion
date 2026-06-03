@@ -66,6 +66,133 @@ export default function SxPropDemo() {
   const runtimeGreen = css({ color: '#28a745', fontWeight: 700 });
   const runtimePurple = css({ color: '#7928ca', fontWeight: 700 });
 
+  // ── MUI-like sx style objects (simulates real MUI sx props) ──
+  const sxCard = {
+    root: css`
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border-radius: 16px;
+      padding: 32px;
+      color: white;
+      box-shadow: 0 10px 40px rgba(102, 126, 234, 0.3);
+      margin-bottom: 24px;
+    `,
+    title: css`
+      font-size: 1.8rem;
+      font-weight: 800;
+      margin: 0 0 8px 0;
+      letter-spacing: -0.5px;
+    `,
+    subtitle: css`
+      font-size: 1rem;
+      opacity: 0.85;
+      margin: 0 0 16px 0;
+      line-height: 1.5;
+    `,
+    button: css`
+      background: rgba(255, 255, 255, 0.2);
+      border: 2px solid rgba(255, 255, 255, 0.4);
+      color: white;
+      padding: 10px 24px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      &:hover { background: rgba(255, 255, 255, 0.3); }
+    `,
+    badge: css`
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255, 255, 255, 0.15);
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      margin-bottom: 16px;
+    `,
+  };
+
+  const sxAlert = {
+    success: css`
+      background: #f0fff4;
+      border: 2px solid #b7eb8f;
+      border-radius: 10px;
+      padding: 16px 20px;
+      color: #2d6a4f;
+      font-size: 0.9rem;
+      line-height: 1.5;
+    `,
+    warning: css`
+      background: #fffbe6;
+      border: 2px solid #ffe58f;
+      border-radius: 10px;
+      padding: 16px 20px;
+      color: #ad8b00;
+      font-size: 0.9rem;
+      line-height: 1.5;
+    `,
+    error: css`
+      background: #fff2f0;
+      border: 2px solid #ffccc7;
+      border-radius: 10px;
+      padding: 16px 20px;
+      color: #a8071a;
+      font-size: 0.9rem;
+      line-height: 1.5;
+    `,
+    info: css`
+      background: #e6f7ff;
+      border: 2px solid #91d5ff;
+      border-radius: 10px;
+      padding: 16px 20px;
+      color: #0050b3;
+      font-size: 0.9rem;
+      line-height: 1.5;
+    `,
+  };
+
+  const sxTypography = {
+    h1: css`
+      font-size: 2.5rem;
+      font-weight: 800;
+      color: #1a1a2e;
+      letter-spacing: -1px;
+      margin: 0 0 4px 0;
+    `,
+    h2: css`
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: #16213e;
+      margin: 0 0 8px 0;
+    `,
+    h3: css`
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: #0f3460;
+      margin: 0 0 6px 0;
+    `,
+    body: css`
+      font-size: 0.95rem;
+      line-height: 1.7;
+      color: #444;
+      margin: 0 0 12px 0;
+    `,
+    caption: css`
+      font-size: 0.75rem;
+      color: #999;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-weight: 600;
+    `,
+    link: css`
+      color: #667eea;
+      text-decoration: none;
+      font-weight: 500;
+      &:hover { text-decoration: underline; }
+    `,
+  };
+
   return (
     <div style={{ maxWidth: 760, margin: '0 auto', padding: 20, fontFamily: 'system-ui, sans-serif' }}>
       <h1 style={{ fontSize: '2rem', color: '#333', marginBottom: 8 }}>
@@ -76,6 +203,131 @@ export default function SxPropDemo() {
         Emotion's <code>css</code> prop. This page validates their SSR/SSG
         behavior and their relationship with Next.js compiler config.
       </p>
+
+      {/* ── 0. Live Style Examples — MUI-like sx demo ── */}
+      <SectionTitle>0. Live Style Examples — MUI sx in Action</SectionTitle>
+
+      {/* Hero Card — typical MUI Paper/Card with sx */}
+      <div css={sxCard.root}>
+        <div css={sxCard.badge}>
+          <span>MUI sx prop simulation</span>
+        </div>
+        <h2 css={sxCard.title}>Welcome to the sx Prop Demo</h2>
+        <p css={sxCard.subtitle}>
+          This card is styled using <code>{'css({ ... })'}</code> at runtime —
+          exactly how MUI processes the <code>sx</code> prop. All styles are
+          pre-rendered at build time (SSG) and visible in the HTML source.
+        </p>
+        <div style={{ display: 'flex', gap: 12 }}>
+          <button css={sxCard.button}>Get Started</button>
+          <button css={sxCard.button}>Learn More</button>
+        </div>
+      </div>
+
+      {/* Typography Showcase */}
+      <div style={{ marginBottom: 24 }}>
+        <div css={sxTypography.caption}>{'Typography (sx={{ variant: \'h1\' }})'}</div>
+        <h1 css={sxTypography.h1}>Heading 1 — Display</h1>
+        <h2 css={sxTypography.h2}>Heading 2 — Section Title</h2>
+        <h3 css={sxTypography.h3}>Heading 3 — Card Title</h3>
+        <p css={sxTypography.body}>
+          Body text with a{' '}
+          <a href="#" css={sxTypography.link}>link styled via sx</a>.
+          This demonstrates nested selectors and pseudo-classes
+          (<code>:hover</code>) working in SSG mode.
+        </p>
+        <div css={sxTypography.caption}>
+          Caption text — all rendered at build time
+        </div>
+      </div>
+
+      {/* Alert variants — like MUI Alert sx={{ severity: 'success' }} */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 24 }}>
+        <div css={sxAlert.success}>
+          <strong>Success Alert</strong> — This alert uses <code>{'css({ ... })'}</code>{' '}
+          runtime syntax, simulating MUI Alert with <code>sx</code> prop.
+          Background and border colors are defined inline.
+        </div>
+        <div css={sxAlert.warning}>
+          <strong>Warning Alert</strong> — All styles are extracted to{' '}
+          <code>{'<style data-emotion>'}</code> at build time. Check View Page Source.
+        </div>
+        <div css={sxAlert.error}>
+          <strong>Error Alert</strong> — Even with complex nested selectors,
+          SSG correctly renders these styles without JavaScript.
+        </div>
+        <div css={sxAlert.info}>
+          <strong>Info Alert</strong> — <strong>Try this:</strong> Disable JavaScript
+          in DevTools and reload — these styles will still be visible (no FOUC).
+        </div>
+      </div>
+
+      {/* Grid / Layout example — like MUI Grid with sx */}
+      <div css={css`
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        margin-bottom: 24px;
+      `}>
+        <div css={css`
+          background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%);
+          border-radius: 12px;
+          padding: 20px;
+          color: #5a1a1a;
+          text-align: center;
+          font-weight: 600;
+          font-size: 0.9rem;
+        `}>
+          Grid Item — sx style
+        </div>
+        <div css={css`
+          background: linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%);
+          border-radius: 12px;
+          padding: 20px;
+          color: #3a1a5a;
+          text-align: center;
+          font-weight: 600;
+          font-size: 0.9rem;
+        `}>
+          Grid Item — sx style
+        </div>
+        <div css={css`
+          background: linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%);
+          border-radius: 12px;
+          padding: 20px;
+          color: #2a3a5a;
+          text-align: center;
+          font-weight: 600;
+          font-size: 0.9rem;
+        `}>
+          Grid Item — sx style
+        </div>
+        <div css={css`
+          background: linear-gradient(135deg, #fddb92 0%, #d1fdff 100%);
+          border-radius: 12px;
+          padding: 20px;
+          color: #5a4a1a;
+          text-align: center;
+          font-weight: 600;
+          font-size: 0.9rem;
+        `}>
+          Grid Item — sx style
+        </div>
+      </div>
+
+      <div style={{
+        background: '#f8f9fa',
+        borderRadius: 8,
+        padding: 16,
+        fontSize: '0.85rem',
+        color: '#666',
+        marginBottom: 32,
+      }}>
+        <strong>{'\u{2705}'} All styles above are SSG-rendered</strong> — they work
+        without <code>compiler.emotion</code> because they use the <code>css()</code>{' '}
+        runtime pattern (same as MUI <code>sx</code>). Open View Page Source and
+        search for <code>data-emotion</code> to confirm.
+      </div>
 
       {/* Key Insight Banner */}
       <div
