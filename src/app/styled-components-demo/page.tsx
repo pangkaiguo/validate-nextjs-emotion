@@ -3,32 +3,34 @@
 
 import { SCDemoCard, SCGradientCard, Counter } from "@/components/styled-components-demo";
 
+const codeStyle: React.CSSProperties = {
+  background: '#f0f0f0',
+  padding: '2px 6px',
+  borderRadius: '4px',
+  fontFamily: '"SF Mono", "Fira Code", "Fira Mono", Menlo, Consolas, monospace',
+  fontSize: '0.85rem',
+  color: '#d63384',
+};
+
 const sectionStyle: React.CSSProperties = {
-  marginBottom: "32px",
+  marginBottom: '32px',
 };
 
 const headingStyle: React.CSSProperties = {
-  color: "#333",
-  fontSize: "1.8rem",
-  borderBottom: "2px solid #7928ca",
-  paddingBottom: "12px",
-  marginBottom: "16px",
+  color: '#1a1a2e',
+  fontSize: '1.6rem',
+  fontWeight: 700,
+  borderBottom: '2px solid #e8e8e8',
+  paddingBottom: '10px',
+  marginTop: '40px',
+  marginBottom: '20px',
 };
 
-const successBoxStyle: React.CSSProperties = {
-  background: "#f3e5f5",
-  border: "2px solid #7928ca",
-  borderRadius: "12px",
-  padding: "20px",
-  marginBottom: "24px",
-};
-
-const codeStyle: React.CSSProperties = {
-  background: "#e3e8ee",
-  padding: "2px 6px",
-  borderRadius: "4px",
-  fontFamily: "monospace",
-  fontSize: "0.85rem",
+const subHeadingStyle: React.CSSProperties = {
+  color: '#666',
+  fontSize: '1rem',
+  lineHeight: '1.6',
+  marginBottom: '20px',
 };
 
 const codeBlockStyle: React.CSSProperties = {
@@ -45,6 +47,15 @@ const HL = ({ children }: { children: React.ReactNode }) => (
   <code style={codeStyle}>{children}</code>
 );
 
+const successBoxStyle: React.CSSProperties = {
+  background: '#f3e5f5',
+  border: '2px solid #7928ca',
+  borderRadius: '10px',
+  padding: '20px',
+  marginBottom: '24px',
+  color: '#6a1b9a',
+};
+
 const CheckList = [
   "✅ styled-components is officially supported by Next.js (unlike Emotion which is 'working on support')",
   "✅ SSR styles injected via StyledComponentsRegistry + useServerInsertedHTML",
@@ -55,7 +66,23 @@ const CheckList = [
 
 export default function SCDemoPage() {
   return (
-    <div style={{ padding: "20px", maxWidth: "900px", margin: "0 auto" }}>
+    <div style={{ padding: "20px", maxWidth: "1200px", margin: "0 auto" }}>
+      <nav style={{ marginBottom: "24px" }}>
+        <a
+          href="/"
+          style={{
+            color: "#7928ca",
+            textDecoration: "none",
+            fontWeight: 600,
+            fontSize: "0.95rem",
+            display: "inline-flex",
+            alignItems: "center",
+            gap: "4px",
+          }}
+        >
+          ← Back to Home
+        </a>
+      </nav>
       <h1
         style={{
           textAlign: "center",
@@ -111,6 +138,58 @@ export default function SCDemoPage() {
             <span style={{ color: "#888" }}>{'// '}✅ First-class support</span>
           </div>
           <div style={{ color: "#7928ca" }}>{'}'}</div>
+        </div>
+      </section>
+
+      {/* Section 1.5: Key Source Code — StyledComponentsRegistry */}
+      <section style={sectionStyle}>
+        <h2 style={headingStyle}>1.5 Key Source Code — StyledComponentsRegistry</h2>
+        <p style={subHeadingStyle}>
+          The registry at <HL>src/lib/styled-components-registry.tsx</HL> uses
+          <HL>useServerInsertedHTML</HL> to capture styled-components styles during SSR:
+        </p>
+        <div style={codeBlockStyle}>
+          {`'use client';
+
+import { ServerStyleSheet, StyleSheetManager }
+  from 'styled-components';
+import { useServerInsertedHTML } from 'next/navigation';
+
+export default function StyledComponentsRegistry({ children }) {
+  const [sheet] = useState(() => new ServerStyleSheet());
+
+  useServerInsertedHTML(() => {
+    const styles = sheet.getStyleElement();
+    sheet.instance.clearTag();
+    return <>{styles}</>;
+  });
+
+  if (typeof window !== 'undefined')
+    return <>{children}</>;
+
+  return (
+    <StyleSheetManager sheet={sheet.instance}>
+      {children}
+    </StyleSheetManager>
+  );
+}`}
+        </div>
+        <p style={subHeadingStyle}>
+          Wired in <HL>src/app/layout.tsx</HL> inside <HL>EmotionRegistry</HL>:
+        </p>
+        <div style={codeBlockStyle}>
+          {`<EmotionRegistry>
+  <StyledComponentsRegistry>
+    {children}
+  </StyledComponentsRegistry>
+</EmotionRegistry>`}
+        </div>
+        <div style={{ background: "#f3e5f5", border: "1px solid #ce93d8", borderRadius: "10px", padding: "20px", marginBottom: "24px" }}>
+          <strong>How it works:</strong> styled-components uses <HL>ServerStyleSheet</HL>
+          to collect styles during SSR. <HL>useServerInsertedHTML</HL> extracts them as
+          <HL>{'<style>'}</HL> elements after each render. The sheet is then cleared to
+          prevent duplicates on the next render. On the client, the registry passes children
+          through directly — no runtime style extraction needed.
         </div>
       </section>
 

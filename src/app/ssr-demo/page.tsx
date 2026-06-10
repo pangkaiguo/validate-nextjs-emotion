@@ -9,64 +9,79 @@ import {
 } from "@/components/ssr-demo-card";
 import { MuiSxDemo } from "@/components/mui-sx-demo";
 
-const sectionStyle: React.CSSProperties = {
-  marginBottom: "32px",
-};
-
-const headingStyle: React.CSSProperties = {
-  color: "#333",
-  fontSize: "1.8rem",
-  borderBottom: "2px solid #0070f3",
-  paddingBottom: "12px",
-  marginBottom: "16px",
-};
-
-const subHeadingStyle: React.CSSProperties = {
-  color: "#555",
-  fontSize: "1rem",
-  lineHeight: "1.6",
-  marginBottom: "20px",
-};
-
-const infoBoxStyle: React.CSSProperties = {
-  background: "#fffbe6",
-  border: "2px solid #ffd666",
-  borderRadius: "12px",
-  padding: "20px",
-  marginBottom: "24px",
-};
-
-const warningBoxStyle: React.CSSProperties = {
-  background: "#fff3e0",
-  border: "2px solid #ff9800",
-  borderRadius: "12px",
-  padding: "20px",
-  marginBottom: "24px",
+// Theme constants — blog-standard styling
+const blog = {
+  primary: '#667eea',
+  success: '#28a745',
 };
 
 const codeStyle: React.CSSProperties = {
-  background: "#e3e8ee",
-  padding: "2px 6px",
-  borderRadius: "4px",
-  fontFamily: "monospace",
-  fontSize: "0.85rem",
-};
-
-const codeBlockStyle: React.CSSProperties = {
-  background: "#f5f5f5",
-  borderRadius: "12px",
-  padding: "24px",
-  fontFamily: "monospace",
-  fontSize: "0.85rem",
-  lineHeight: "1.7",
-  overflowX: "auto" as const,
+  background: '#f0f0f0',
+  padding: '2px 6px',
+  borderRadius: '4px',
+  fontFamily: '"SF Mono", "Fira Code", "Fira Mono", Menlo, Consolas, monospace',
+  fontSize: '0.85rem',
+  color: '#d63384',
 };
 
 const HL = ({ children }: { children: React.ReactNode }) => (
   <code style={codeStyle}>{children}</code>
 );
 
-// ===== Static metrics embedded in SSR HTML (no client hooks needed) =====
+const sectionStyle: React.CSSProperties = {
+  marginBottom: '32px',
+};
+
+const headingStyle: React.CSSProperties = {
+  color: '#1a1a2e',
+  fontSize: '1.6rem',
+  fontWeight: 700,
+  borderBottom: '2px solid #e8e8e8',
+  paddingBottom: '10px',
+  marginTop: '40px',
+  marginBottom: '20px',
+};
+
+const subHeadingStyle: React.CSSProperties = {
+  color: '#666',
+  fontSize: '1rem',
+  lineHeight: '1.6',
+  marginBottom: '20px',
+};
+
+const infoBoxStyle: React.CSSProperties = {
+  background: '#f0f7ff',
+  border: '1px solid #b8d4fe',
+  borderRadius: '10px',
+  padding: '20px',
+  marginBottom: '24px',
+  color: '#1a56db',
+};
+
+const warningBoxStyle: React.CSSProperties = {
+  background: '#fffbe6',
+  border: '1px solid #ffe58f',
+  borderRadius: '10px',
+  padding: '20px',
+  marginBottom: '24px',
+  color: '#ad8b00',
+};
+
+const codeBlockStyle: React.CSSProperties = {
+  background: '#1e1e1e',
+  color: '#d4d4d4',
+  padding: '20px',
+  borderRadius: '10px',
+  fontSize: '0.85rem',
+  fontFamily: '"SF Mono", "Fira Code", "Fira Mono", Menlo, Consolas, monospace',
+  lineHeight: '1.6',
+  overflowX: 'auto' as const,
+  marginBottom: '20px',
+  whiteSpace: 'pre-wrap' as const,
+  wordBreak: 'break-word' as const,
+};
+
+// ===== Static metrics embedded in SSR HTML =====
 
 const MetricCard: React.CSSProperties = {
   background: "#f0f8ff",
@@ -106,7 +121,23 @@ const CheckList = [
 
 export default function SSRDemoPage() {
   return (
-    <div style={{ padding: "20px", maxWidth: "900px", margin: "0 auto" }}>
+    <div style={{ padding: "20px", maxWidth: "1200px", margin: "0 auto" }}>
+      <nav style={{ marginBottom: "24px" }}>
+        <a
+          href="/"
+          style={{
+            color: "#667eea",
+            textDecoration: "none",
+            fontWeight: 600,
+            fontSize: "0.95rem",
+            display: "inline-flex",
+            alignItems: "center",
+            gap: "4px",
+          }}
+        >
+          ← Back to Home
+        </a>
+      </nav>
       <h1
         style={{
           textAlign: "center",
@@ -186,6 +217,72 @@ export default function SSRDemoPage() {
           <div style={{ color: "#28a745", marginTop: "8px", fontWeight: 600 }}>
             ✓ Browser receives fully styled HTML — FOUC-free rendering
           </div>
+        </div>
+      </section>
+
+      {/* Section 1.5: Key Source Code — EmotionRegistry */}
+      <section style={sectionStyle}>
+        <h2 style={headingStyle}>
+          1.5 Key Source Code — EmotionRegistry
+        </h2>
+        <p style={subHeadingStyle}>
+          The core of SSR support is <HL>src/lib/emotion-registry.tsx</HL>.
+          It captures Emotion-generated styles during server rendering and injects them
+          into <HL>{"<head>"}</HL> via <HL>useServerInsertedHTML</HL>.
+        </p>
+        <div style={codeBlockStyle}>
+          {`'use client';
+
+import { CacheProvider } from '@emotion/react';
+import createCache from '@emotion/cache';
+import { useServerInsertedHTML } from 'next/navigation';
+
+export default function EmotionRegistry({ children }) {
+  const [cache] = useState(() => {
+    const cache = createCache({ key: 'css' });
+    cache.compat = true;
+    return cache;
+  });
+
+  useServerInsertedHTML(() => {
+    const entries = cache.inserted;
+    const styles = Object.keys(entries)
+      .map((key) => entries[key]);
+    if (styles.length === 0) return null;
+
+    return (
+      <style
+        data-emotion={\`\${cache.key} \${Object.keys(entries).join(' ')}\`}
+        dangerouslySetInnerHTML={{ __html: styles.join('') }}
+      />
+    );
+  });
+
+  return <CacheProvider value={cache}>{children}</CacheProvider>;
+}`}
+        </div>
+        <p style={subHeadingStyle}>
+          This registry is wired in <HL>src/app/layout.tsx</HL>:
+        </p>
+        <div style={codeBlockStyle}>
+          {`export default function RootLayout({ children }) {
+  return (
+    <html lang="en">
+      <body>
+        <EmotionRegistry>
+          {children}
+        </EmotionRegistry>
+      </body>
+    </html>
+  );
+}`}
+        </div>
+        <div style={infoBoxStyle}>
+          <strong>How it works:</strong> During SSR, each Emotion component adds its
+          generated CSS to the cache. <HL>useServerInsertedHTML</HL> runs
+          after the component tree renders, extracts all cached styles, and injects them
+          as <HL>{"<style data-emotion>"}</HL> tags in <HL>{"<head>"}</HL>.
+          The browser receives fully styled HTML — no JavaScript needed to see the styles.
         </div>
       </section>
 

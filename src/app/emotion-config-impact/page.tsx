@@ -74,21 +74,22 @@ const Desc = styled.p`
 //    Without it, you get: "Unrecognized prop: css"
 // ======================================================
 
-const codeStyle = {
+const codeStyle: React.CSSProperties = {
   background: '#1e1e1e',
   color: '#d4d4d4',
-  padding: '12px',
-  borderRadius: '8px',
-  fontSize: '0.8rem',
-  fontFamily: 'monospace',
+  padding: '16px',
+  borderRadius: '10px',
+  fontSize: '0.85rem',
+  fontFamily: '"SF Mono", "Fira Code", "Fira Mono", Menlo, Consolas, monospace',
   overflowX: 'auto' as const,
   whiteSpace: 'pre-wrap' as const,
-  marginBottom: '12px',
+  wordBreak: 'break-word' as const,
+  marginBottom: '16px',
+  lineHeight: 1.6,
 };
 
 export default function EmotionConfigImpact() {
   // This styled() call works regardless of config
-  // It is a runtime JS function call — no compiler transform needed.
   const WorksAlways = styled.p`
     color: ${colors.success};
     font-weight: 700;
@@ -98,15 +99,28 @@ export default function EmotionConfigImpact() {
     border-radius: 6px;
   `;
 
-  // ── Simulate what styled-components class name looks like ──
-  // Without compiler option, each server/client render generates
-  // a different hash. We show this with "server class" vs "client class".
-  const SC_SERVER_CLASS = 'sc-bdVaJa';  // e.g. could be this server-side
-  const SC_CLIENT_CLASS = 'sc-gsTCUz';  // e.g. different hash client-side
-  const MISMATCH_EXAMPLE = false; // toggle to simulate
+  const SC_SERVER_CLASS = 'sc-bdVaJa';
+  const SC_CLIENT_CLASS = 'sc-gsTCUz';
+  const MISMATCH_EXAMPLE = false;
 
   return (
-    <div style={{ maxWidth: 700, margin: '0 auto', padding: 20 }}>
+    <div style={{ maxWidth: 1200, margin: '0 auto', padding: '40px 24px' }}>
+      <nav style={{ marginBottom: '24px' }}>
+        <a
+          href="/"
+          style={{
+            color: '#17a2b8',
+            textDecoration: 'none',
+            fontWeight: 600,
+            fontSize: '0.95rem',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '4px',
+          }}
+        >
+          ← Back to Home
+        </a>
+      </nav>
       <h1 style={{ fontSize: '2rem', color: '#333', marginBottom: 8 }}>
         ⚙️ Compiler Config Impact Demo
       </h1>

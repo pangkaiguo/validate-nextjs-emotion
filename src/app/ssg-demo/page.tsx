@@ -8,47 +8,62 @@ import { MuiSxDemo } from "@/components/mui-sx-demo";
 // Force static generation — no server needed at runtime
 export const dynamic = "force-static";
 
+const codeStyle: React.CSSProperties = {
+  background: "#f0f0f0",
+  padding: "2px 6px",
+  borderRadius: "4px",
+  fontFamily: '"SF Mono", "Fira Code", "Fira Mono", Menlo, Consolas, monospace',
+  fontSize: "0.85rem",
+  color: "#d63384",
+};
+
+const HL = ({ children }: { children: React.ReactNode }) => (
+  <code style={codeStyle}>{children}</code>
+);
+
 const sectionStyle: React.CSSProperties = {
   marginBottom: "32px",
 };
 
 const headingStyle: React.CSSProperties = {
-  color: "#333",
-  fontSize: "1.8rem",
-  borderBottom: "2px solid #28a745",
-  paddingBottom: "12px",
-  marginBottom: "16px",
+  color: "#1a1a2e",
+  fontSize: "1.6rem",
+  fontWeight: 700,
+  borderBottom: "2px solid #e8e8e8",
+  paddingBottom: "10px",
+  marginTop: "40px",
+  marginBottom: "20px",
+};
+
+const subHeadingStyle: React.CSSProperties = {
+  color: "#666",
+  fontSize: "1rem",
+  lineHeight: "1.6",
+  marginBottom: "20px",
 };
 
 const infoBoxStyle: React.CSSProperties = {
-  background: "#e8f5e9",
-  border: "2px solid #28a745",
-  borderRadius: "12px",
+  background: "#f0fff4",
+  border: "1px solid #b7eb8f",
+  borderRadius: "10px",
   padding: "20px",
   marginBottom: "24px",
-};
-
-const codeStyle: React.CSSProperties = {
-  background: "#e3e8ee",
-  padding: "2px 6px",
-  borderRadius: "4px",
-  fontFamily: "monospace",
-  fontSize: "0.85rem",
+  color: "#2d6a4f",
 };
 
 const codeBlockStyle: React.CSSProperties = {
-  background: "#f5f5f5",
-  borderRadius: "12px",
-  padding: "24px",
-  fontFamily: "monospace",
+  background: "#1e1e1e",
+  color: "#d4d4d4",
+  padding: "20px",
+  borderRadius: "10px",
   fontSize: "0.85rem",
-  lineHeight: "1.7",
+  fontFamily: '"SF Mono", "Fira Code", "Fira Mono", Menlo, Consolas, monospace',
+  lineHeight: "1.6",
   overflowX: "auto" as const,
+  marginBottom: "20px",
+  whiteSpace: "pre-wrap" as const,
+  wordBreak: "break-word" as const,
 };
-
-const Highlight = ({ children }: { children: React.ReactNode }) => (
-  <code style={codeStyle}>{children}</code>
-);
 
 // ===== Static SSG metrics (embedded at build time, no client hooks) =====
 
@@ -90,7 +105,23 @@ const CheckList = [
 
 export default function SSGDemoPage() {
   return (
-    <div style={{ padding: "20px", maxWidth: "900px", margin: "0 auto" }}>
+    <div style={{ padding: "20px", maxWidth: "1200px", margin: "0 auto" }}>
+      <nav style={{ marginBottom: "24px" }}>
+        <a
+          href="/"
+          style={{
+            color: "#28a745",
+            textDecoration: "none",
+            fontWeight: 600,
+            fontSize: "0.95rem",
+            display: "inline-flex",
+            alignItems: "center",
+            gap: "4px",
+          }}
+        >
+          ← Back to Home
+        </a>
+      </nav>
       <h1
         style={{
           textAlign: "center",
@@ -116,7 +147,7 @@ export default function SSGDemoPage() {
             Next.js CSS-in-JS docs
           </a>
           , Emotion is <strong>not yet officially supported</strong> in the App Router.
-          This SSG workaround <Highlight>EmotionRegistry + useServerInsertedHTML</Highlight> works
+          This SSG workaround <HL>EmotionRegistry + useServerInsertedHTML</HL> works
           today but may need updates as official support matures.
         </p>
         <p style={{ margin: "8px 0 0", color: "#555", lineHeight: 1.6 }}>
@@ -133,9 +164,9 @@ export default function SSGDemoPage() {
           {"\u26A1"} This page is statically generated — zero client runtime
         </strong>
         <p style={{ margin: "8px 0 0", color: "#333", lineHeight: 1.5 }}>
-          Configured with <Highlight>export const dynamic = "force-static"</Highlight>,
+          Configured with <HL>export const dynamic = "force-static"</HL>,
           this page is pre-rendered into HTML at <strong>build time</strong>.
-          Emotion styles are captured by <Highlight>EmotionRegistry</Highlight> during
+          Emotion styles are captured by <HL>EmotionRegistry</HL> during
           static generation — just like SSR, but without needing a runtime server.
         </p>
       </div>
@@ -145,29 +176,29 @@ export default function SSGDemoPage() {
         <h2 style={headingStyle}>
           1. Build Output Structure
         </h2>
-        <p style={{ color: "#555", fontSize: "1rem", lineHeight: "1.6", marginBottom: "20px" }}>
-          When you run <Highlight>npm run build</Highlight>, Next.js generates these files:
+        <p style={subHeadingStyle}>
+          When you run <HL>npm run build</HL>, Next.js generates these files:
         </p>
         <div style={codeBlockStyle}>
           <div style={{ color: "#555" }}>
             .next/server/app/ssg-demo/
           </div>
           <div style={{ color: "#d63384", paddingLeft: "16px" }}>
-            {"\u251C\u2500\u2500"} page.html{" "}
+            {"\u251C\u2500\u2500"} page.html{' '}
             <span style={{ color: "#888" }}>
-              {"// "}Static HTML with Emotion {"<style>"} tags baked in
+              {'// '}Static HTML with Emotion {'<style>'} tags baked in
             </span>
           </div>
           <div style={{ color: "#d63384", paddingLeft: "16px" }}>
-            {"\u251C\u2500\u2500"} page.json{" "}
+            {"\u251C\u2500\u2500"} page.json{' '}
             <span style={{ color: "#888" }}>
-              {"// "}RSC Payload for client navigation
+              {'// '}RSC Payload for client navigation
             </span>
           </div>
           <div style={{ color: "#d63384", paddingLeft: "16px" }}>
-            {"\u2514\u2500\u2500"} page.js{" "}
+            {"\u2514\u2500\u2500"} page.js{' '}
             <span style={{ color: "#888" }}>
-              {"// "}Client component hydration bundle
+              {'// '}Client component hydration bundle
             </span>
           </div>
           <div style={{ color: "#888", marginTop: "8px" }}>
@@ -176,12 +207,62 @@ export default function SSGDemoPage() {
         </div>
       </section>
 
+      {/* Section 1.5: Key Source Code — EmotionRegistry */}
+      <section style={sectionStyle}>
+        <h2 style={headingStyle}>
+          1.5 Key Source Code — EmotionRegistry
+        </h2>
+        <p style={subHeadingStyle}>
+          The same <HL>EmotionRegistry</HL> used for SSR also powers SSG.
+          During <HL>next build</HL>, Next.js renders this page to static HTML;
+          <HL>useServerInsertedHTML</HL> captures Emotion styles and bakes them
+          directly into the output <HL>.html</HL> file.
+        </p>
+        <div style={codeBlockStyle}>
+          {`'use client';
+
+import { CacheProvider } from '@emotion/react';
+import createCache from '@emotion/cache';
+import { useServerInsertedHTML } from 'next/navigation';
+
+export default function EmotionRegistry({ children }) {
+  const [cache] = useState(() => {
+    const cache = createCache({ key: 'css' });
+    cache.compat = true;
+    return cache;
+  });
+
+  useServerInsertedHTML(() => {
+    const entries = cache.inserted;
+    const styles = Object.keys(entries)
+      .map((key) => entries[key]);
+    if (styles.length === 0) return null;
+
+    return (
+      <style
+        data-emotion={\`\${cache.key} \${Object.keys(entries).join(' ')}\`}
+        dangerouslySetInnerHTML={{ __html: styles.join('') }}
+      />
+    );
+  });
+
+  return <CacheProvider value={cache}>{children}</CacheProvider>;
+}`}
+        </div>
+        <div style={infoBoxStyle}>
+          <strong>Key insight:</strong> <HL>useServerInsertedHTML</HL> works during
+          <strong> both SSR and SSG</strong>. During static generation, it runs at build
+          time and injects Emotion styles into the pre-rendered <HL>.html</HL> file.
+          The resulting file is fully self-contained — deployable to any CDN or static host.
+        </div>
+      </section>
+
       {/* Section 2.5: MUI sx Prop — SSG Rendered */}
       <section style={sectionStyle}>
         <h2 style={{ ...headingStyle, borderBottomColor: '#7928ca' }}>
           2.5 MUI sx Prop — Static Generated
         </h2>
-        <p style={{ color: "#555", fontSize: "1rem", lineHeight: "1.6", marginBottom: "20px" }}>
+        <p style={subHeadingStyle}>
           This section demonstrates that MUI-style <code>{'sx={{ ... }}'}</code> props
           are fully pre-rendered during static generation. MUI processes <code>sx</code>
           at runtime by calling Emotion's <code>css()</code> — the same pattern used below.
@@ -195,7 +276,7 @@ export default function SSGDemoPage() {
         <h2 style={headingStyle}>
           2. Emotion Components — Static Generated
         </h2>
-        <p style={{ color: "#555", fontSize: "1rem", lineHeight: "1.6", marginBottom: "20px" }}>
+        <p style={subHeadingStyle}>
           These Emotion-powered components were rendered during <strong>static generation</strong>.
           Their styles are extracted and embedded in the static HTML output file.
         </p>
@@ -218,7 +299,7 @@ export default function SSGDemoPage() {
         <h2 style={headingStyle}>
           3. SSG Performance Characteristics
         </h2>
-        <p style={{ color: "#555", fontSize: "1rem", lineHeight: "1.6", marginBottom: "20px" }}>
+        <p style={subHeadingStyle}>
           Static Generation delivers the fastest possible load times. These are
           the expected characteristics for this page:
         </p>

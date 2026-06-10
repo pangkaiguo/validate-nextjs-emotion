@@ -6,17 +6,20 @@ import styled from '@emotion/styled';
 import { ClientPerformanceMonitor } from "@/components/perf-monitor-client";
 
 const Container = styled.div`
-  max-width: 1000px;
+  max-width: 1200px;
   margin: 0 auto;
-  padding: 40px 20px;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  padding: 40px 24px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
 `;
 
 const Title = styled.h1`
   text-align: center;
   font-size: 2.8rem;
-  color: #333;
+  font-weight: 800;
+  color: #1a1a2e;
+  letter-spacing: -0.02em;
   margin-bottom: 8px;
+  line-height: 1.2;
 `;
 
 const Subtitle = styled.p`
@@ -35,7 +38,9 @@ const NavCard = styled.div<{ gradient: string }>`
   cursor: pointer;
   transition: transform 0.2s, box-shadow 0.2s;
   text-decoration: none;
-  display: block;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
 
   &:hover {
     transform: translateY(-4px);
@@ -53,6 +58,9 @@ const NavDesc = styled.p`
   opacity: 0.9;
   line-height: 1.5;
   font-size: 0.95rem;
+  overflow-wrap: break-word;
+  word-break: break-word;
+  hyphens: auto;
 `;
 
 const NavTag = styled.span<{ bg: string }>`
@@ -68,9 +76,19 @@ const NavTag = styled.span<{ bg: string }>`
 
 const Grid = styled.div`
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  grid-template-columns: 1fr 1fr;
   gap: 24px;
   margin-bottom: 48px;
+
+  & > a {
+    display: flex;
+    text-decoration: none;
+    height: 100%;
+  }
+
+  @media (max-width: 600px) {
+    grid-template-columns: 1fr;
+  }
 `;
 
 const SectionTitle = styled.h2`
@@ -190,8 +208,22 @@ export default function Home() {
           </NavCard>
         </a>
 
-        <a href="/" style={{ textDecoration: 'none' }}>
+        <a href="/dangerous-html" style={{ textDecoration: 'none' }}>
           <NavCard gradient="linear-gradient(135deg, #f093fb 0%, #f5576c 100%)">
+            <NavTag bg="rgba(255,255,255,0.25)">
+              {'\u{1F512}'} Security
+            </NavTag>
+            <NavTitle>dangerouslySetInnerHTML Solutions</NavTitle>
+            <NavDesc>
+              5 strategies to safely handle HTML content in CMS: StructuredJSON,
+              Markdown, RTE JSON, DOMPurify sanitization, and CSS-in-JS SSR analysis.
+              Interactive live demos with XSS attack vectors.
+            </NavDesc>
+          </NavCard>
+        </a>
+
+        <a href="/" style={{ textDecoration: 'none' }}>
+          <NavCard gradient="linear-gradient(135deg, #667eea 0%, #11998e 100%)">
             <NavTag bg="rgba(255,255,255,0.25)">
               {'\u{1F3AD}'} Feature Tests
             </NavTag>

@@ -195,7 +195,23 @@ export default function SxPropDemo() {
   };
 
   return (
-    <div style={{ maxWidth: 760, margin: '0 auto', padding: 20, fontFamily: 'system-ui, sans-serif' }}>
+    <div style={{ maxWidth: 1200, margin: '0 auto', padding: '40px 24px' }}>
+      <nav style={{ marginBottom: '24px' }}>
+        <a
+          href="/"
+          style={{
+            color: '#7928ca',
+            textDecoration: 'none',
+            fontWeight: 600,
+            fontSize: '0.95rem',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '4px',
+          }}
+        >
+          ← Back to Home
+        </a>
+      </nav>
       <h1 style={{ fontSize: '2rem', color: '#333', marginBottom: 8 }}>
         sx Prop SSR/SSG Validation
       </h1>
